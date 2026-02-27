@@ -1,0 +1,56 @@
+{
+  "formatter": {
+    "external": {
+      "command": "prettier",
+      "arguments": ["--stdin-filepath", "{buffer_path}"]
+    }
+  },
+  "format_on_save": "on",
+  "languages": {
+    "TypeScript": {
+      "language_servers": ["typescript-language-server", "eslint", "!biome", "..."],
+      "formatter": [
+        { "code_action": "source.fixAll.eslint" },
+        {
+          "external": {
+            "command": "prettier",
+            "arguments": ["--stdin-filepath", "{buffer_path}"]
+          }
+        }
+      ]
+    },
+    "TSX": {
+      "language_servers": ["typescript-language-server", "eslint", "!biome", "..."],
+      "formatter": [
+        { "code_action": "source.fixAll.eslint" },
+        {
+          "external": {
+            "command": "prettier",
+            "arguments": ["--stdin-filepath", "{buffer_path}"]
+          }
+        }
+      ]
+    },
+    "JavaScript": {
+      "language_servers": ["typescript-language-server", "eslint", "!biome", "..."],
+      "formatter": [
+        { "code_action": "source.fixAll.eslint" },
+        {
+          "external": {
+            "command": "prettier",
+            "arguments": ["--stdin-filepath", "{buffer_path}"]
+          }
+        }
+      ]
+    },
+    "JSON": {
+      "language_servers": ["json-language-server", "!biome", "..."],
+      "formatter": {
+        "external": {
+          "command": "prettier",
+          "arguments": ["--stdin-filepath", "{buffer_path}"]
+        }
+      }
+    }
+  }
+}

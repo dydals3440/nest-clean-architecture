@@ -21,6 +21,10 @@
     "test:integration": "jest --config jest.integration.config.ts",
     "test:e2e": "jest --config jest.e2e.config.ts",
     "typecheck": "tsc --noEmit",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:clean": "docker compose down -v",
+    "db:logs": "docker compose logs -f db",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -30,6 +34,7 @@
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
+    "@nestjs/config": "^4.0.3",
     "@nestjs/core": "^11.0.1",
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/adapter-pg": "^7.4.1",

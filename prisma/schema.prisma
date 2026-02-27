@@ -1,0 +1,41 @@
+// prisma/schema.prisma
+
+// 제너레이터: PrismaClient 코드를 생성하는 설정
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+// 데이터소스: 사용할 데이터베이스 설정
+datasource db {
+  provider = "postgresql"
+}
+
+/// Todo 모델 - todos 테이블에 매핑됩니다.
+///
+/// 이 스키마 정의는 Infrastructure 관심사입니다.
+/// Domain Layer의 엔티티와는 별개입니다.
+/// 도메인 엔티티는 비즈니스 규칙의 표현이고,
+/// 이 스키마는 저장 방식의 정의입니다.
+model Todo {
+  /// Primary Key: 자동 증가 정수 ID
+  id Int @id @default(autoincrement())
+
+  /// 할 일 제목: 필수 필드
+  title String
+
+  /// 할 일 설명: 선택 필드
+  description String?
+
+  /// 상태: PENDING, IN_PROGRESS, DONE 등
+  status String @default("PENDING")
+
+  /// 생성일시: 레코드 삽입 시 자동으로 현재 시간 설정
+  createdAt DateTime @default(now()) @map("created_at")
+
+  /// 수정일시: 업데이트 시 자동으로 현재 시간 설정
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  /// 실제 테이블 이름을 snake_case로 매핑
+  @@map("todos")
+}
