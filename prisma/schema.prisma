@@ -1,41 +1,68 @@
 // prisma/schema.prisma
 
-// 제너레이터: PrismaClient 코드를 생성하는 설정
+// ─────────────────────────────────────────────
+// Generator: Prisma Client 생성 설정
+// ─────────────────────────────────────────────
+
 generator client {
+  // Prisma 7에서는 "prisma-client"를 사용합니다
   provider = "prisma-client"
+
+  // 생성된 클라이언트의 출력 경로
+  // 이 경로에 TypeScript 타입과 PrismaClient 코드가 생성됩니다
   output   = "../src/generated/prisma"
 }
 
-// 데이터소스: 사용할 데이터베이스 설정
+// ─────────────────────────────────────────────
+// Datasource: 데이터베이스 연결 설정
+// ─────────────────────────────────────────────
+
 datasource db {
+  // 사용할 데이터베이스 종류
   provider = "postgresql"
 }
 
-/// Todo 모델 - todos 테이블에 매핑됩니다.
+// ─────────────────────────────────────────────
+// Model: 테이블 정의
+// ─────────────────────────────────────────────
+
+/// Todo 테이블 모델
 ///
-/// 이 스키마 정의는 Infrastructure 관심사입니다.
-/// Domain Layer의 엔티티와는 별개입니다.
-/// 도메인 엔티티는 비즈니스 규칙의 표현이고,
-/// 이 스키마는 저장 방식의 정의입니다.
+/// ⚠️ 도메인 엔티티(Todo)와 1:1 대응하지 않을 수 있습니다.
+/// 예를 들어:
+/// - DB 컬럼은 snake_case, 도메인 필드는 camelCase (@map으로 매핑)
+/// - DB에는 인덱스, 제약조건 등 영속성 관련 설정이 있음
+/// - 도메인에는 계산 필드, 행위 메서드 등이 있음
+/// 이런 차이를 Mapper가 해결합니다.
 model Todo {
-  /// Primary Key: 자동 증가 정수 ID
-  id Int @id @default(autoincrement())
+  /// 기본 키: 자동 증가 정수
+  /// @id - 이 필드가 기본 키임을 선언합니다
+  /// @default(autoincrement()) - 자동 증가 값을 기본값으로 설정합니다
+  id          Int       @id @default(autoincrement())
 
-  /// 할 일 제목: 필수 필드
-  title String
+  /// Todo 제목 (필수)
+  /// String 타입은 기본적으로 NOT NULL입니다
+  /// 길이 제한은 도메인 계층(TodoTitle)에서 처리합니다
+  title       String
 
-  /// 할 일 설명: 선택 필드
+  /// Todo 설명 (선택적)
+  /// String? - ?를 붙이면 nullable 컬럼이 됩니다
   description String?
 
-  /// 상태: PENDING, IN_PROGRESS, DONE 등
-  status String @default("PENDING")
+  /// Todo 상태
+  /// @default("PENDING") - 기본값을 'PENDING'으로 설정합니다
+  status      String    @default("PENDING")
 
-  /// 생성일시: 레코드 삽입 시 자동으로 현재 시간 설정
-  createdAt DateTime @default(now()) @map("created_at")
+  /// 생성 시각
+  /// @default(now()) - 레코드 생성 시 자동으로 현재 시각 설정
+  /// @map("created_at") - DB 컬럼명을 snake_case로 매핑
+  createdAt   DateTime  @default(now()) @map("created_at")
 
-  /// 수정일시: 업데이트 시 자동으로 현재 시간 설정
-  updatedAt DateTime @updatedAt @map("updated_at")
+  /// 수정 시각
+  /// @updatedAt - 레코드 업데이트 시 Prisma가 자동으로 갱신
+  /// @map("updated_at") - DB 컬럼명을 snake_case로 매핑
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  /// 실제 테이블 이름을 snake_case로 매핑
+  /// @@map("todos") - 모델명 Todo를 DB 테이블명 todos로 매핑
   @@map("todos")
 }
