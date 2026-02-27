@@ -9,7 +9,11 @@
       "Bash(pnpm test:integration 2>&1)",
       "Bash(pnpm test 2>&1)",
       "Bash(pnpm db:clean 2>&1)",
-      "Bash(DATABASE_URL=\"postgresql://user:password@localhost:5432/todo_test\" pnpm db:push 2>&1)"
+      "Bash(DATABASE_URL=\"postgresql://user:password@localhost:5432/todo_test\" pnpm db:push 2>&1)",
+      "Bash(find /Users/kim-yongmin/Desktop/architecture/src/todo -type f -name \"*.ts\" 2>/dev/null | head -30)",
+      "Bash(find /Users/kim-yongmin/Desktop/architecture/src/todo -type f -name \"*.ts\" -exec grep -l \"TodoStatus\" {} \\\\;)",
+      "Bash(pnpm typecheck 2>&1)",
+      "Bash(pnpm lint 2>&1)"
     ]
   }
 }

@@ -19,8 +19,7 @@ export class TestDatabase {
   constructor() {
     // 테스트 전용 PostgreSQL 데이터베이스에 연결
     const adapter = new PrismaPg({
-      connectionString:
-        'postgresql://user:password@localhost:5432/todo_test',
+      connectionString: 'postgresql://user:password@localhost:5432/todo_test',
     });
     this._prisma = new PrismaClient({ adapter });
   }
