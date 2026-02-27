@@ -47,4 +47,4 @@ async function bootstrap(): Promise<void> {
   logger.log(`API URL: http://localhost:${port}/api`);
 }
 
-bootstrap();
+void bootstrap();

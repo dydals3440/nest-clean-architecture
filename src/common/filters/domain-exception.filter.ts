@@ -8,24 +8,18 @@ import {
 import { Request, Response } from 'express';
 
 import { DomainError } from '../../todo/domain/errors/domain.error';
-import { TodoNotFoundError } from '../../todo/domain/errors/todo-not-found.error';
-import { InvalidTodoTitleError } from '../../todo/domain/errors/invalid-todo-title.error';
-import { InvalidStatusTransitionError } from '../../todo/domain/errors/invalid-status-transition.error';
 
 /**
- * 도메인 에러 → HTTP 상태 코드 매핑
+ * 도메인 에러 code → HTTP 상태 코드 매핑
  *
- * 에러 클래스를 키로, HTTP 상태 코드를 값으로 가지는 맵입니다.
- * 새로운 도메인 에러가 추가되면 여기에 매핑을 추가합니다.
+ * DomainError의 code 문자열을 키로 사용하여 구체 에러 클래스 import를 제거합니다.
+ * 새로운 도메인 에러가 추가되면 해당 code와 HTTP 상태 코드를 추가합니다.
  */
-const DOMAIN_ERROR_STATUS_MAP = new Map<
-  new (...args: any[]) => DomainError,
-  HttpStatus
->([
-  [TodoNotFoundError, HttpStatus.NOT_FOUND], // 404
-  [InvalidTodoTitleError, HttpStatus.BAD_REQUEST], // 400
-  [InvalidStatusTransitionError, HttpStatus.CONFLICT], // 409
-]);
+const DOMAIN_ERROR_CODE_STATUS: Record<string, HttpStatus> = {
+  TODO_NOT_FOUND: HttpStatus.NOT_FOUND, // 404
+  INVALID_TODO_TITLE: HttpStatus.BAD_REQUEST, // 400
+  INVALID_STATUS_TRANSITION: HttpStatus.CONFLICT, // 409
+};
 
 /**
  * 도메인 예외를 HTTP 응답으로 변환하는 글로벌 필터
@@ -81,22 +75,15 @@ export class DomainExceptionFilter implements ExceptionFilter {
   }
 
   /**
-   * 도메인 에러 클래스에 따른 HTTP 상태 코드를 반환합니다.
+   * 도메인 에러 code에 따른 HTTP 상태 코드를 반환합니다.
    *
-   * DOMAIN_ERROR_STATUS_MAP에 등록되지 않은 에러는
+   * DOMAIN_ERROR_CODE_STATUS에 등록되지 않은 code는
    * 기본적으로 400 Bad Request를 반환합니다.
    *
    * @param exception - 도메인 에러 인스턴스
    * @returns HTTP 상태 코드
    */
   private getHttpStatus(exception: DomainError): HttpStatus {
-    for (const [ErrorClass, status] of DOMAIN_ERROR_STATUS_MAP) {
-      if (exception instanceof ErrorClass) {
-        return status;
-      }
-    }
-
-    // 매핑되지 않은 DomainError는 400으로 처리
-    return HttpStatus.BAD_REQUEST;
+    return DOMAIN_ERROR_CODE_STATUS[exception.code] ?? HttpStatus.BAD_REQUEST;
   }
 }

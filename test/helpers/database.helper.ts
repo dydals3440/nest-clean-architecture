@@ -1,93 +1,65 @@
 // test/helpers/database.helper.ts
+
+import { PrismaClient } from '@/generated/prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../../src/generated/prisma/client';
 
 /**
  * 테스트용 데이터베이스 헬퍼
  *
- * 각 테스트(또는 테스트 스위트)마다 독립적인 테스트 전용 PostgreSQL 데이터베이스를
- * 생성하고 관리합니다.
+ * Part 3의 Prisma 스키마에 맞춰 테스트 전용 PostgreSQL을 설정합니다.
  *
- * 테스트 전용 DB를 사용하는 이유:
- * 1. 각 테스트가 깨끗한 상태에서 시작합니다.
- * 2. 프로덕션 DB와 격리되어 안전합니다.
- * 3. 테스트 종료 후 데이터를 정리할 수 있습니다.
+ * Prisma 스키마 (schema.prisma):
+ * - id: Int @id @default(autoincrement())
+ * - title: String
+ * - description: String?
+ * - status: String @default("PENDING")
+ * - createdAt: DateTime @default(now()) @map("created_at")
+ * - updatedAt: DateTime @updatedAt @map("updated_at")
  */
 export class TestDatabase {
-  private _prisma: PrismaClient;
+  private prisma!: PrismaClient;
 
-  constructor() {
-    // 테스트 전용 PostgreSQL 데이터베이스에 연결
+  /**
+   * 테스트용 DB를 연결합니다.
+   * PrismaPg 어댑터를 사용하여 PostgreSQL에 연결합니다.
+   */
+  setup(): PrismaClient {
     const adapter = new PrismaPg({
-      connectionString: 'postgresql://user:password@localhost:5432/todo_test',
+      connectionString:
+        process.env.TEST_DATABASE_URL ??
+        'postgresql://user:password@localhost:5432/todo_test',
     });
-    this._prisma = new PrismaClient({ adapter });
+    this.prisma = new PrismaClient({ adapter });
+    return this.prisma;
   }
 
-  /**
-   * PrismaClient 인스턴스를 반환합니다.
-   * 리포지토리나 서비스에 주입할 때 사용합니다.
-   */
   get db(): PrismaClient {
-    return this._prisma;
+    return this.prisma;
   }
 
   /**
-   * 테이블을 생성합니다.
-   * 각 테스트 시작 전에 호출하여 스키마를 설정합니다.
-   *
-   * prisma db push로 테스트 DB에 스키마를 반영하거나,
-   * prisma migrate deploy로 마이그레이션을 실행합니다.
-   */
-  async setup(): Promise<void> {
-    // PrismaClient 연결 초기화
-    await this._prisma.$connect();
-  }
-
-  /**
-   * 모든 테이블의 데이터를 삭제합니다.
-   * 각 테스트 후에 호출하여 데이터를 정리합니다.
+   * todos 테이블의 모든 데이터를 삭제하고 ID 시퀀스를 리셋합니다.
+   * TRUNCATE + RESTART IDENTITY로 매 테스트가 ID 1부터 시작하도록 보장합니다.
    */
   async cleanup(): Promise<void> {
-    await this._prisma.todo.deleteMany();
+    await this.prisma.$executeRawUnsafe(
+      'TRUNCATE TABLE "todos" RESTART IDENTITY CASCADE',
+    );
   }
 
   /**
-   * 데이터베이스 연결을 종료합니다.
-   * 테스트 스위트 종료 시 호출합니다.
+   * Prisma 연결을 종료합니다.
    */
   async close(): Promise<void> {
-    await this._prisma.$disconnect();
+    await this.prisma.$disconnect();
   }
 }
 
 /**
- * 테스트용 데이터베이스를 생성하고 설정하는 팩토리 함수
- *
- * @example
- * describe('MyRepository', () => {
- *   let testDb: TestDatabase;
- *
- *   beforeAll(async () => {
- *     testDb = await createTestDatabase();
- *   });
- *
- *   afterEach(async () => {
- *     await testDb.cleanup();
- *   });
- *
- *   afterAll(async () => {
- *     await testDb.close();
- *   });
- *
- *   it('should save todo', () => {
- *     const repository = new PrismaTodoRepository(testDb.db);
- *     // ...
- *   });
- * });
+ * 테스트용 데이터베이스를 생성하고 연결하는 팩토리 함수
  */
-export async function createTestDatabase(): Promise<TestDatabase> {
+export function createTestDatabase(): TestDatabase {
   const testDb = new TestDatabase();
-  await testDb.setup();
+  testDb.setup();
   return testDb;
 }

@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { AppModule } from '@/app.module';
-import { DatabaseModule } from '@/database';
+import { DatabaseModule, PRISMA_SERVICE } from '@/database';
+import { PrismaClient } from '../../src/generated/prisma/client';
 
 /**
  * 테스트용 NestJS 애플리케이션 헬퍼
@@ -66,6 +67,22 @@ export class TestApp {
     this._app.setGlobalPrefix('api');
 
     await this._app.init();
+  }
+
+  /**
+   * 테이블 데이터 초기화 (테스트 간 격리)
+   * TRUNCATE + RESTART IDENTITY로 매 테스트가 ID 1부터 시작하도록 보장
+   */
+  async clearDatabase(): Promise<void> {
+    if (!this.module) {
+      throw new Error(
+        'TestApp이 초기화되지 않았습니다. init()을 먼저 호출하세요.',
+      );
+    }
+    const db = this.module.get<PrismaClient>(PRISMA_SERVICE);
+    await db.$executeRawUnsafe(
+      'TRUNCATE TABLE "todos" RESTART IDENTITY CASCADE',
+    );
   }
 
   /**

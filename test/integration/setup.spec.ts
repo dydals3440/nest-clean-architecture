@@ -6,8 +6,8 @@ import {
 describe('Test Database Setup', () => {
   let testDb: TestDatabase;
 
-  beforeAll(async () => {
-    testDb = await createTestDatabase();
+  beforeAll(() => {
+    testDb = createTestDatabase();
   });
 
   afterAll(async () => {

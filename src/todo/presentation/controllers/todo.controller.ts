@@ -117,17 +117,12 @@ export class TodoController {
    */
   @Get()
   async findAll(
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
+    @Query('page') page?: number,
+    @Query('limit') limit?: number,
     @Query('status') status?: TodoStatusType,
     @Query('search') search?: string,
   ): Promise<PaginatedTodoResponse> {
-    const result = await this.todoService.findAll(
-      page ? parseInt(page, 10) : undefined,
-      limit ? parseInt(limit, 10) : undefined,
-      status,
-      search,
-    );
+    const result = await this.todoService.findAll(page, limit, status, search);
 
     return PaginatedTodoResponse.from(result);
   }

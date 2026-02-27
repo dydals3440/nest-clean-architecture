@@ -44,7 +44,7 @@ import { DomainExceptionFilter } from './common/filters/domain-exception.filter'
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         url: configService.get<string>(
-          'DATABSE_URL',
+          'DATABASE_URL',
           'postgresql://user:password@localhost:5432/todo_db',
         ),
       }),
