@@ -10,6 +10,7 @@ services:
       POSTGRES_DB: todo_db
     volumes:
       - todo_data:/var/lib/postgresql/data
+      - ./docker/init-test-db.sql:/docker-entrypoint-initdb.d/init-test-db.sql
 
 volumes:
   todo_data:

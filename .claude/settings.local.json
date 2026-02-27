@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "WebSearch",
-      "WebFetch(domain:zed.dev)"
+      "WebFetch(domain:zed.dev)",
+      "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.jest, null, 2\\)\\)\")",
+      "Bash(pnpm test:unit 2>&1)",
+      "Bash(pnpm list jest ts-jest 2>&1)",
+      "Bash(pnpm test:integration 2>&1)",
+      "Bash(pnpm test 2>&1)",
+      "Bash(pnpm db:clean 2>&1)",
+      "Bash(DATABASE_URL=\"postgresql://user:password@localhost:5432/todo_test\" pnpm db:push 2>&1)"
     ]
   }
 }
