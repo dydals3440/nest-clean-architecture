@@ -20,7 +20,9 @@
       "Bash(pnpm add -D eslint-plugin-jest)",
       "Bash(pnpm test:unit:*)",
       "Bash(pnpm run test:e2e:*)",
-      "Bash(pnpm test:e2e:*)"
+      "Bash(pnpm test:e2e:*)",
+      "Bash(npx jest:*)",
+      "Bash(git -C /Users/kim-yongmin/Desktop/architecture status --short)"
     ]
   }
 }
